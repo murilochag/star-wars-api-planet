@@ -2,6 +2,8 @@ package br.com.starwarsapiplanet.starwarsapiplanet.domain;
 
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.List;
+
 public record PlanetaDTO(String nome, PlanetaClima clima, String terreno) {
 
 
@@ -9,8 +11,10 @@ public record PlanetaDTO(String nome, PlanetaClima clima, String terreno) {
         Planeta planeta = new Planeta();
         planeta.setId(null);
         planeta.setNome(this.nome);
-        planeta.setClima(this.clima.toString());
+        planeta.setClima(this.clima);
         planeta.setTerreno(this.terreno);
         return planeta;
     }
+
+
 }

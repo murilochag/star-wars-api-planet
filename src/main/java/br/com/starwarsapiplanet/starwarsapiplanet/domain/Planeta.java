@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,7 +22,16 @@ public class Planeta {
 
     private String nome;
 
-    private String clima;
+    @Enumerated(EnumType.STRING)
+    private PlanetaClima clima;
+
+    public PlanetaClima getClima() {
+        return clima;
+    }
+
+    public void setClima(PlanetaClima clima) {
+        this.clima = clima;
+    }
 
     private String terreno;
 
@@ -40,13 +51,6 @@ public class Planeta {
         this.nome = nome;
     }
 
-    public String getClima() {
-        return clima;
-    }
-
-    public void setClima(String clima) {
-        this.clima = clima;
-    }
 
     public String getTerreno() {
         return terreno;
@@ -54,5 +58,15 @@ public class Planeta {
 
     public void setTerreno(String terreno) {
         this.terreno = terreno;
+    }
+
+    public PlanetaDTO toPlanetaDto(){
+
+        PlanetaDTO planetaDTO = new PlanetaDTO(
+                this.nome,
+                this.clima,
+                this.terreno
+        );
+        return planetaDTO;
     }
 }
