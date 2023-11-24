@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class PlanetaController {
@@ -33,11 +34,17 @@ public class PlanetaController {
         List<Planeta> planetas = planetaRepository.findAll();
         List<PlanetaDTO> planetasDTO = new ArrayList<>();
 
-        for (Planeta planeta: planetas) {
-            planetasDTO.add(planeta.toPlanetaDto());
-        }
+        planetas.forEach(planeta -> planetasDTO.add(planeta.toPlanetaDto()));
 
         return ResponseEntity.status(HttpStatus.OK).body(planetasDTO);
+    }
+
+    @GetMapping("planeta/{id}")
+    public ResponseEntity<PlanetaDTO> buscarPorId(@PathVariable Integer id){
+
+        PlanetaDTO planetaDTO = planetaRepository.findById(id).get().toPlanetaDto();
+
+        return ResponseEntity.status(HttpStatus.OK).body(planetaDTO);
     }
 
 }
