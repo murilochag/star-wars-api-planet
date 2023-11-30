@@ -47,4 +47,12 @@ public class PlanetaController {
         return ResponseEntity.status(HttpStatus.OK).body(planetaDTO);
     }
 
+    @GetMapping("planeta/{nomePlaneta}/nome")
+    public ResponseEntity<PlanetaDTO> buscarPornome(@PathVariable String nomePlaneta){
+
+        PlanetaDTO planetaDTO = planetaRepository.buscarPlanetaPorNome(nomePlaneta).get(0).toPlanetaDto();
+
+        return ResponseEntity.status(HttpStatus.OK).body(planetaDTO);
+    }
+
 }
