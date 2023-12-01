@@ -6,6 +6,7 @@ import br.com.starwarsapiplanet.starwarsapiplanet.domain.PlanetaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -53,6 +54,29 @@ public class PlanetaController {
         PlanetaDTO planetaDTO = planetaRepository.buscarPlanetaPorNome(nomePlaneta).get(0).toPlanetaDto();
 
         return ResponseEntity.status(HttpStatus.OK).body(planetaDTO);
+    }
+
+    @PutMapping("planeta")
+    @Transactional
+    public ResponseEntity<PlanetaDTO> alterar(@RequestBody PlanetaDTO planetaDTO){
+
+        Planeta planeta = planetaRepository.getReferenceById(planetaDTO.id());
+        Planeta planetaAtualizado = planeta.atualizar(planetaDTO);
+
+        PlanetaDTO planetaDTOAtualizado = planetaAtualizado.toPlanetaDto();
+        
+        return ResponseEntity.status(HttpStatus.OK).body(planetaDTOAtualizado);
+    }
+
+    @DeleteMapping("planeta/{planetaID}")
+    public ResponseEntity<PlanetaDTO> excluir(@PathVariable Integer planetaID){
+
+        if(!planetaRepository.existsById(planetaID)){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        planetaRepository.deleteById(planetaID);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 }

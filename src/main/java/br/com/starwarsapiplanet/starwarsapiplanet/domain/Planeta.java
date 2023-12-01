@@ -63,10 +63,25 @@ public class Planeta {
     public PlanetaDTO toPlanetaDto(){
 
         PlanetaDTO planetaDTO = new PlanetaDTO(
+                this.id,
                 this.nome,
                 this.clima,
                 this.terreno
         );
         return planetaDTO;
+    }
+
+    public Planeta atualizar(PlanetaDTO planetaDTO) {
+        if(planetaDTO.nome() != null){
+            this.nome = planetaDTO.nome();
+        }
+        if(planetaDTO.clima() != null){
+            this.clima = planetaDTO.clima();
+        }
+        if(planetaDTO.terreno() != null){
+            this.terreno = planetaDTO.terreno();
+        }
+
+        return this;
     }
 }
