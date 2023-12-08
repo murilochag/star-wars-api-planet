@@ -3,15 +3,16 @@ package br.com.starwarsapiplanet.starwarsapiplanet.controller;
 import br.com.starwarsapiplanet.starwarsapiplanet.domain.Planeta;
 import br.com.starwarsapiplanet.starwarsapiplanet.domain.PlanetaDTO;
 import br.com.starwarsapiplanet.starwarsapiplanet.domain.PlanetaRepository;
+import br.com.starwarsapiplanet.starwarsapiplanet.dto.PlanetaApiDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 public class PlanetaController {
@@ -77,6 +78,35 @@ public class PlanetaController {
         planetaRepository.deleteById(planetaID);
 
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @GetMapping("planeta/swapi/{planetaId}")
+    public ResponseEntity<PlanetaApiDTO> buscarPlanetaAPI(@PathVariable String planetaId){
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        String url = "https://swapi.dev/api/planets/" + planetaId;
+
+        try {
+            ResponseEntity<PlanetaApiDTO> response = restTemplate
+                    .getForEntity(url, PlanetaApiDTO.class);
+
+            return ResponseEntity.status(HttpStatus.OK).body(response.getBody());
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
+//        System.out.println("resposta: " + response);
+//        System.out.println("corpo da resposta: " + response.getBody());
+
+//        if(){
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+//        }
+
+
     }
 
 }
