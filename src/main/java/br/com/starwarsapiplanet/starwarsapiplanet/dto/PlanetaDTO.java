@@ -1,5 +1,7 @@
-package br.com.starwarsapiplanet.starwarsapiplanet.domain;
+package br.com.starwarsapiplanet.starwarsapiplanet.dto;
 
+import br.com.starwarsapiplanet.starwarsapiplanet.domain.Planeta;
+import br.com.starwarsapiplanet.starwarsapiplanet.domain.PlanetaClima;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;

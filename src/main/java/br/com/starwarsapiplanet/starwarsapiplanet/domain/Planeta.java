@@ -1,13 +1,11 @@
 package br.com.starwarsapiplanet.starwarsapiplanet.domain;
 
 
+import br.com.starwarsapiplanet.starwarsapiplanet.dto.PlanetaDTO;
+import br.com.starwarsapiplanet.starwarsapiplanet.dto.PlanetaDTOResponse;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import java.util.List;
 
 
 @AllArgsConstructor
