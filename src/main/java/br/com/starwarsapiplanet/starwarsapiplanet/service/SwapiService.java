@@ -1,7 +1,11 @@
 package br.com.starwarsapiplanet.starwarsapiplanet.service;
 
+import br.com.starwarsapiplanet.starwarsapiplanet.domain.Planeta;
+import br.com.starwarsapiplanet.starwarsapiplanet.domain.PlanetaRepository;
 import br.com.starwarsapiplanet.starwarsapiplanet.dto.PlanetaApiDTO;
+import br.com.starwarsapiplanet.starwarsapiplanet.dto.PlanetaDTOResponse;
 import br.com.starwarsapiplanet.starwarsapiplanet.swapi.Result;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -13,6 +17,9 @@ import java.util.List;
 public class SwapiService {
 
     RestTemplate template = new RestTemplate();
+
+    @Autowired
+    PlanetaRepository planetaRepository;
 
     public PlanetaApiDTO buscarPlanetaPorId(String planetaId){
         String url = "https://swapi.dev/api/planets/" + planetaId;
@@ -26,32 +33,46 @@ public class SwapiService {
         ResponseEntity<Result> response = template
                 .getForEntity(url, Result.class);
         return response.getBody();
+    }
+
+    public List<PlanetaDTOResponse> contruirLista(List<Planeta> planetas, List<PlanetaApiDTO> lista){
+
+        List<PlanetaDTOResponse> planetasDtoResponse = new ArrayList<>();
+
+        for (Planeta planeta: planetas) {
+            planetasDtoResponse.add(new PlanetaDTOResponse(
+                        planeta.getId(),
+                        planeta.getNome(),
+                        planeta.getClima(),
+                        planeta.getTerreno(),
+                        buscarAparicoesPorNome(planeta.getNome(), lista)
+                    )
+            );
+        }
+        return planetasDtoResponse;
 
     }
 
-    public PlanetaApiDTO buscarPlanetaPorNome(String nome){
+    public List<String> buscarAparicoesPorNome(String nome, List<PlanetaApiDTO> lista){
 
-        Result listaPlanetas = buscarPlanetas();
-
-        while (listaPlanetas.next != null){
-            List<PlanetaApiDTO> lista = listaPlanetas.results;
-            for (PlanetaApiDTO p: lista) {
-                if (p.getName().equalsIgnoreCase(nome)){
-                    return p;
-                }
+        for(PlanetaApiDTO planeta: lista){
+            if(planeta.getName().equalsIgnoreCase(nome) && planeta.getFilms() != null){
+                return planeta.getFilms();
             }
-            listaPlanetas = template.getForEntity(listaPlanetas.next.toString(), Result.class).getBody();
         }
         return null;
     }
 
-    public List<String> buscarAparicoesPorNome(String nome){
+    public List<PlanetaApiDTO> listarPlantasApi(){
 
-        PlanetaApiDTO planeta = buscarPlanetaPorNome(nome);
+        Result result = buscarPlanetas();
+        List<PlanetaApiDTO> lista = result.results;
 
-        if(planeta == null){
-            return new ArrayList<>();
+        while (result.next != null){
+            lista.addAll(result.results);
+            result = template.getForEntity(result.next, Result.class).getBody();
         }
-        return planeta.getFilms();
+        System.out.println("acabou de listar");
+        return lista;
     }
 }
