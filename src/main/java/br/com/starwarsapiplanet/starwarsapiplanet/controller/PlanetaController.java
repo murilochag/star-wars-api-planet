@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -35,9 +36,10 @@ public class PlanetaController {
     public ResponseEntity<List<PlanetaDTOResponse>> buscartodos(){
 
         List<Planeta> planetas = planetaRepository.findAll();
-
-        List<PlanetaDTOResponse> listPlanetasDtoResponse = swapiService.contruirLista(planetas, swapiService.listarPlantasApi());
-
+        List<PlanetaDTOResponse> listPlanetasDtoResponse = new ArrayList<>();
+        planetas.forEach(p -> listPlanetasDtoResponse.add(
+                new PlanetaDTOResponse(p.getId(), p.getNome(), p.getClima(), p.getTerreno(), swapiService.buscarAparicaoPorNome(p.getNome()))
+        ));
         return ResponseEntity.status(HttpStatus.OK).body(listPlanetasDtoResponse);
     }
 
@@ -45,7 +47,7 @@ public class PlanetaController {
     public ResponseEntity<PlanetaDTOResponse> buscarPorId(@PathVariable Integer id){
 
         Planeta planeta = planetaRepository.findById(id).get();
-        PlanetaDTOResponse planetaDTOResponse = new PlanetaDTOResponse(planeta.getId(), planeta.getNome(), planeta.getClima(), planeta.getTerreno(), swapiService.buscarAparicoesPorNome(planeta.getNome(), swapiService.listarPlantasApi()));
+        PlanetaDTOResponse planetaDTOResponse = new PlanetaDTOResponse(planeta.getId(), planeta.getNome(), planeta.getClima(), planeta.getTerreno(), swapiService.buscarAparicaoPorNome(planeta.getNome()));
         return ResponseEntity.status(HttpStatus.OK).body(planetaDTOResponse);
     }
 
@@ -53,7 +55,7 @@ public class PlanetaController {
     public ResponseEntity<PlanetaDTOResponse> buscarPornome(@PathVariable String nomePlaneta){
 
         Planeta planeta = planetaRepository.findByNomeIgnoreCase(nomePlaneta).get(0);
-        PlanetaDTOResponse planetaDTOResponse = new PlanetaDTOResponse(planeta.getId(), planeta.getNome(), planeta.getClima(), planeta.getTerreno(), swapiService.buscarAparicoesPorNome(planeta.getNome(), swapiService.listarPlantasApi()));
+        PlanetaDTOResponse planetaDTOResponse = new PlanetaDTOResponse(planeta.getId(), planeta.getNome(), planeta.getClima(), planeta.getTerreno(), swapiService.buscarAparicaoPorNome(planeta.getNome()));
         return ResponseEntity.status(HttpStatus.OK).body(planetaDTOResponse);
     }
 

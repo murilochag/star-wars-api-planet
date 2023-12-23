@@ -18,8 +18,6 @@ public class SwapiService {
 
     RestTemplate template = new RestTemplate();
 
-    @Autowired
-    PlanetaRepository planetaRepository;
 
     public PlanetaApiDTO buscarPlanetaPorId(String planetaId){
         String url = "https://swapi.dev/api/planets/" + planetaId;
@@ -35,44 +33,20 @@ public class SwapiService {
         return response.getBody();
     }
 
-    public List<PlanetaDTOResponse> contruirLista(List<Planeta> planetas, List<PlanetaApiDTO> lista){
 
-        List<PlanetaDTOResponse> planetasDtoResponse = new ArrayList<>();
+    public List<String> buscarAparicaoPorNome(String nome){
 
-        for (Planeta planeta: planetas) {
-            planetasDtoResponse.add(new PlanetaDTOResponse(
-                        planeta.getId(),
-                        planeta.getNome(),
-                        planeta.getClima(),
-                        planeta.getTerreno(),
-                        buscarAparicoesPorNome(planeta.getNome(), lista)
-                    )
-            );
+        String url = "https://swapi.dev/api/planets/?search=" + nome.toLowerCase();
+
+        List<PlanetaApiDTO> response = template.getForEntity(url, Result.class).getBody().getResults();
+
+        if(response.isEmpty()){
+            return null;
         }
-        return planetasDtoResponse;
-
-    }
-
-    public List<String> buscarAparicoesPorNome(String nome, List<PlanetaApiDTO> lista){
-
-        for(PlanetaApiDTO planeta: lista){
-            if(planeta.getName().equalsIgnoreCase(nome) && planeta.getFilms() != null){
-                return planeta.getFilms();
-            }
+        if(response.get(0).getName().equalsIgnoreCase(nome)){
+            return response.get(0).getFilms();
         }
         return null;
     }
 
-    public List<PlanetaApiDTO> listarPlantasApi(){
-
-        Result result = buscarPlanetas();
-        List<PlanetaApiDTO> lista = result.results;
-
-        while (result.next != null){
-            lista.addAll(result.results);
-            result = template.getForEntity(result.next, Result.class).getBody();
-        }
-        System.out.println("acabou de listar");
-        return lista;
-    }
 }
