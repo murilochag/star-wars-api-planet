@@ -4,90 +4,60 @@ import br.com.starwarsapiplanet.starwarsapiplanet.domain.Planeta;
 import br.com.starwarsapiplanet.starwarsapiplanet.dto.PlanetaDTO;
 import br.com.starwarsapiplanet.starwarsapiplanet.domain.PlanetaRepository;
 import br.com.starwarsapiplanet.starwarsapiplanet.dto.PlanetaDTOResponse;
-import br.com.starwarsapiplanet.starwarsapiplanet.service.SwapiService;
+import br.com.starwarsapiplanet.starwarsapiplanet.service.PlanetaSevice;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 public class PlanetaController {
 
     @Autowired
-    PlanetaRepository planetaRepository;
-    @Autowired
-    SwapiService swapiService;
+    PlanetaSevice planetaSevice;
 
 
     @PostMapping("/planeta")
-    public ResponseEntity<Planeta> cadastrar(@RequestBody PlanetaDTO planetaDTO){
-
-        Planeta planeta = planetaDTO.toPlaneta();
-        planetaRepository.save(planeta);
-
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<PlanetaDTOResponse> cadastrar(@RequestBody PlanetaDTO planetaDTO){
+        return ResponseEntity.status(HttpStatus.CREATED).body(planetaSevice.salvar(planetaDTO));
     }
 
     @GetMapping("/planeta")
-    public ResponseEntity<List<PlanetaDTOResponse>> buscartodos(){
-
-        List<Planeta> planetas = planetaRepository.findAll();
-        List<PlanetaDTOResponse> listPlanetasDtoResponse = new ArrayList<>();
-        planetas.forEach(p -> listPlanetasDtoResponse.add(
-                new PlanetaDTOResponse(p.getId(), p.getNome(), p.getClima(), p.getTerreno(), swapiService.buscarAparicaoPorNome(p.getNome()))
-        ));
-        return ResponseEntity.status(HttpStatus.OK).body(listPlanetasDtoResponse);
+    public ResponseEntity<List<PlanetaDTOResponse>> buscartodos(Pageable pageable){
+        return ResponseEntity.status(HttpStatus.OK).body(planetaSevice.buscarTodos(pageable));
     }
 
-    @GetMapping("planeta/{id}")
-    public ResponseEntity<PlanetaDTOResponse> buscarPorId(@PathVariable Integer id){
-
-        Planeta planeta = planetaRepository.findById(id).get();
-        PlanetaDTOResponse planetaDTOResponse = new PlanetaDTOResponse(planeta.getId(), planeta.getNome(), planeta.getClima(), planeta.getTerreno(), swapiService.buscarAparicaoPorNome(planeta.getNome()));
-        return ResponseEntity.status(HttpStatus.OK).body(planetaDTOResponse);
+    @GetMapping("planeta/{planetaID}")
+    public ResponseEntity<PlanetaDTOResponse> buscarPorId(@PathVariable Integer planetaID){
+        if(planetaSevice.buscarPorId(planetaID) == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(planetaSevice.buscarPorId(planetaID));
     }
 
     @GetMapping("planeta/{nomePlaneta}/nome")
     public ResponseEntity<PlanetaDTOResponse> buscarPornome(@PathVariable String nomePlaneta){
-
-        Planeta planeta = planetaRepository.findByNomeIgnoreCase(nomePlaneta).get(0);
-        PlanetaDTOResponse planetaDTOResponse = new PlanetaDTOResponse(planeta.getId(), planeta.getNome(), planeta.getClima(), planeta.getTerreno(), swapiService.buscarAparicaoPorNome(planeta.getNome()));
-        return ResponseEntity.status(HttpStatus.OK).body(planetaDTOResponse);
+        if(planetaSevice.buscarPorNome(nomePlaneta) == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(planetaSevice.buscarPorNome(nomePlaneta));
     }
 
     @PutMapping("planeta")
-    @Transactional
-    public ResponseEntity<PlanetaDTO> alterar(@RequestBody PlanetaDTO planetaDTO){
-
-        Planeta planeta = planetaRepository.getReferenceById(planetaDTO.id());
-        Planeta planetaAtualizado = planeta.atualizar(planetaDTO);
-
-        PlanetaDTO planetaDTOAtualizado = planetaAtualizado.toPlanetaDto();
-        
-        return ResponseEntity.status(HttpStatus.OK).body(planetaDTOAtualizado);
+    public ResponseEntity<PlanetaDTOResponse> alterar(@RequestBody PlanetaDTO planetaDTO){
+        return ResponseEntity.status(HttpStatus.OK).body(planetaSevice.atualizar(planetaDTO));
     }
 
     @DeleteMapping("planeta/{planetaID}")
     public ResponseEntity<PlanetaDTO> excluir(@PathVariable Integer planetaID){
 
-        if(!planetaRepository.existsById(planetaID)){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        if(planetaSevice.deletar(planetaID)){
+            return ResponseEntity.status(HttpStatus.OK).build();
         }
-        planetaRepository.deleteById(planetaID);
-
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
-
-//    @GetMapping("planeta/swapi/{nome}")
-//    public ResponseEntity<PlanetaApiDTO> buscarPlanetaAPI(@PathVariable String nome){
-//
-//        PlanetaApiDTO planeta = swapiService.buscarPlanetaPorNome(nome);
-//
-//        return ResponseEntity.status(HttpStatus.OK).body(planeta);
-//    }
 
 }

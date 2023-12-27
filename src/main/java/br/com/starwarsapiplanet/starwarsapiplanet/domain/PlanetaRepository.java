@@ -14,5 +14,7 @@ public interface PlanetaRepository extends JpaRepository<Planeta, Integer> {
 
     List<Planeta> findByNomeIgnoreCase(String nome);
 
+    boolean existsByNome(String nome);
+
 
 }

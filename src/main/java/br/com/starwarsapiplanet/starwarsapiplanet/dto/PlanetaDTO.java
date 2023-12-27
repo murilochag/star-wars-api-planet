@@ -11,7 +11,7 @@ public record PlanetaDTO(Integer id, String nome, PlanetaClima clima, String ter
 
     public Planeta toPlaneta(){
         Planeta planeta = new Planeta();
-        planeta.setId(null);
+        planeta.setId(this.id);
         planeta.setNome(this.nome);
         planeta.setClima(this.clima);
         planeta.setTerreno(this.terreno);
